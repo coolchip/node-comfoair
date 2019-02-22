@@ -107,8 +107,7 @@ comfoair.write(command, (err) => {
 
 ## API
 
-### getBootloaderVersion
-___
+#### getBootloaderVersion
 
 Request bootloader version and device type. No parameter required.
 
@@ -139,10 +138,10 @@ getBootloaderVersion(callback);
             "label": "Device name"
         }
     }
-}```
+}
+```
 
-### getFirmwareVersion
-___
+#### getFirmwareVersion
 
 Request firmware version and device type. No parameter required.
 
@@ -176,8 +175,7 @@ getFirmwareVersion(callback);
 }
 ```
 
-### getFanState
-___
+#### getFanState
 
 Request state of the supply and the exhaust fan. No parameter required.
 
@@ -187,36 +185,35 @@ getFanState(callback);
 
 ```json
 {
-    type: 'RES',
-    valid: true,
-    payload: {
-        description: 'Fan state',
-        supplyAir: {
-            value: 35,
-            label: 'Supply air',
-            unit: '%'
+    "type": "RES",
+    "valid": true,
+    "payload": {
+        "description": "Fan state",
+        "supplyAir": {
+            "value": 35,
+            "label": "Supply air",
+            "unit": "%"
         },
-        outgoingAir: {
-            value: 35,
-            label: 'Outgoing air',
-            unit: '%'
+        "outgoingAir": {
+            "value": 35,
+            "label": "Outgoing air",
+            "unit": "%"
         },
-        rotaitionsSupply: {
-            value: 1138,
-            label: 'Rotaitions supply',
-            unit: 'rpm'
+        "rotaitionsSupply": {
+            "value": 1138,
+            "label": "Rotaitions supply",
+            "unit": "rpm"
         },
-        rotaitionsOutgoing: {
-            value: 1120,
-            label: 'Rotaitions outgoing',
-            unit: 'rpm'
+        "rotaitionsOutgoing": {
+            "value": 1120,
+            "label": "Rotaitions outgoing",
+            "unit": "rpm"
         }
     }
 }
 ```
 
-### getOperatingHours
-___
+#### getOperatingHours
 
 Request operating hours of the different modes. No parameter required.
 
@@ -226,56 +223,55 @@ getOperatingHours(callback);
 
 ```json
 {
-    type: 'RES',
-    valid: true,
-    payload: {
-        description: 'Operating hours',
-        away: {
-            value: 13492,
-            label: 'away',
-            unit: 'h'
+    "type": "RES",
+    "valid": true,
+    "payload": {
+        "description": "Operating hours",
+        "away": {
+            "value": 13492,
+            "label": "away",
+            "unit": "h"
         },
-        low: {
-            value: 12833,
-            label: 'low',
-            unit: 'h'
+        "low": {
+            "value": 12833,
+            "label": "low",
+            "unit": "h"
         },
-        middle: {
-            value: 7699,
-            label: 'middle',
-            unit: 'h'
+        "middle": {
+            "value": 7699,
+            "label": "middle",
+            "unit": "h"
         },
-        frostProtection: {
-            value: 662,
-            label: 'frost protection',
-            unit: 'h'
+        "frostProtection": {
+            "value": 662,
+            "label": "frost protection",
+            "unit": "h"
         },
-        preHeating: {
-            value: 0,
-            label: 'preheating',
-            unit: 'h'
+        "preHeating": {
+            "value": 0,
+            "label": "preheating",
+            "unit": "h"
         },
-        bypassOpen: {
-            value: 10008,
-            label: 'bypass open',
-            unit: 'h'
+        "bypassOpen": {
+            "value": 10008,
+            "label": "bypass open",
+            "unit": "h"
         },
-        filter: {
-            value: 1825,
-            label: 'filter',
-            unit: 'h'
+        "filter": {
+            "value": 1825,
+            "label": "filter",
+            "unit": "h"
         },
-        high: {
-            value: 1068,
-            label: 'high',
-            unit: 'h'
+        "high": {
+            "value": 1068,
+            "label": "high",
+            "unit": "h"
         }
     }
 }
 ```
 
-### getVentilationLevel
-___
+#### getVentilationLevel
 
 Request ventilation levels. No parameter required.
 
@@ -285,75 +281,74 @@ getVentilationLevel(callback);
 
 ```json
 {
-    type: 'RES',
-    valid: true,
-    payload: {
-        description: 'Get ventilation levles',
-        exhaustAway: {
-            value: 15,
-            label: 'Exhaust fan level away',
-            unit: '%'
+    "type": "RES",
+    "valid": true,
+    "payload": {
+        "description": "Get ventilation levles",
+        "exhaustAway": {
+            "value": 15,
+            "label": "Exhaust fan level away",
+            "unit": "%"
         },
-        exhaustLow: {
-            value: 35,
-            label: 'Exhaust fan level low',
-            unit: '%'
+        "exhaustLow": {
+            "value": 35,
+            "label": "Exhaust fan level low",
+            "unit": "%"
         },
-        exhaustMiddle: {
-            value: 50,
-            label: 'Exhaust fan level middle',
-            unit: '%'
+        "exhaustMiddle": {
+            "value": 50,
+            "label": "Exhaust fan level middle",
+            "unit": "%"
         },
-        supplyAway: {
-            value: 15,
-            label: 'Supply fan level away',
-            unit: '%'
+        "supplyAway": {
+            "value": 15,
+            "label": "Supply fan level away",
+            "unit": "%"
         },
-        supplyLow: {
-            value: 35,
-            label: 'Supply fan level low',
-            unit: '%'
+        "supplyLow": {
+            "value": 35,
+            "label": "Supply fan level low",
+            "unit": "%"
         },
-        supplyMiddle: {
-            value: 50,
-            label: 'Supply fan level middle',
-            unit: '%'
+        "supplyMiddle": {
+            "value": 50,
+            "label": "Supply fan level middle",
+            "unit": "%"
         },
-        exhaustCurrent: {
-            value: 15,
-            label: 'Current exhaust fan level',
-            unit: '%'
+        "exhaustCurrent": {
+            "value": 15,
+            "label": "Current exhaust fan level",
+            "unit": "%"
         },
-        supplyCurrent: {
-            value: 15,
-            label: 'Current supply fan level',
-            unit: '%'
+        "supplyCurrent": {
+            "value": 15,
+            "label": "Current supply fan level",
+            "unit": "%"
         },
-        currentLevel: {
-            value: 1,
-            label: 'Current ventilation level',
-            unit: '%'
+        "currentLevel": {
+            "value": 1,
+            "label": "Current ventilation level",
+            "unit": "%"
         },
-        supplyFanRunning: {
-            value: true,
-            label: 'Supply fan is running'
+        "supplyFanRunning": {
+            "value": true,
+            "label": "Supply fan is running"
         },
-        exhaustHigh: {
-            value: 70,
-            label: 'Exhaust fan level high',
-            unit: '%'
+        "exhaustHigh": {
+            "value": 70,
+            "label": "Exhaust fan level high",
+            "unit": "%"
         },
-        supplyHigh: {
-            value: 70,
-            label: 'Exhaust fan level high',
-            unit: '%'
+        "supplyHigh": {
+            "value": 70,
+            "label": "Exhaust fan level high",
+            "unit": "%"
         }
     }
 }
 ```
 
-### getTemparatures
-___
+#### getTemparatures
 
 Request current temperatures. No parameter required.
 
@@ -363,60 +358,59 @@ getTemparatures(callback);
 
 ```json
 {
-    type: 'RES',
-    valid: true,
-    payload: {
-        description: 'Temperatures',
-        comfort: {
-            value: 21,
-            label: 'comfort',
-            unit: '°C'
+    "type": "RES",
+    "valid": true,
+    "payload": {
+        "description": "Temperatures",
+        "comfort": {
+            "value": 21,
+            "label": "comfort",
+            "unit": "°C"
         },
-        outsideAir: {
-            value: 11,
-            label: 'outside air',
-            unit: '°C'
+        "outsideAir": {
+            "value": 11,
+            "label": "outside air",
+            "unit": "°C"
         },
-        supplyAir: {
-            value: 20.5,
-            label: 'supply air',
-            unit: '°C'
+        "supplyAir": {
+            "value": 20.5,
+            "label": "supply air",
+            "unit": "°C"
         },
-        outgoingAir: {
-            value: 19.5,
-            label: 'outgoing air',
-            unit: '°C'
+        "outgoingAir": {
+            "value": 19.5,
+            "label": "outgoing air",
+            "unit": "°C"
         },
-        exhaustAir: {
-            value: 11.5,
-            label: 'exhaust air',
-            unit: '°C'
+        "exhaustAir": {
+            "value": 11.5,
+            "label": "exhaust air",
+            "unit": "°C"
         },
-        sensorConnected: {
-            value: [Object],
-            label: 'sensor connected'
+        "sensorConnected": {
+            "value": [],
+            "label": "sensor connected"
         },
-        groundHeatExchanger: {
-            value: 0,
-            label: 'ground heat exchanger',
-            unit: '°C'
+        "groundHeatExchanger": {
+            "value": 0,
+            "label": "ground heat exchanger",
+            "unit": "°C"
         },
-        preheating: {
-            value: 0,
-            label: 'preheating',
-            unit: '°C'
+        "preheating": {
+            "value": 0,
+            "label": "preheating",
+            "unit": "°C"
         },
-        cookerHood: {
-            value: 0,
-            label: 'cooker hood',
-            unit: '°C'
+        "cookerHood": {
+            "value": 0,
+            "label": "cooker hood",
+            "unit": "°C"
         }
     }
 }
 ```
 
-### getTemparatureStates
-___
+#### getTemparatureStates
 
 Request temperature states. No parameter required.
 
@@ -426,36 +420,35 @@ getTemparatureStates(callback);
 
 ```json
 {
-    type: 'RES',
-    valid: true,
-    payload: {
-        description: 'Temperature states',
-        outsideAir: {
-            value: 11,
-            label: 'outside air',
-            unit: '°C'
+    "type": "RES",
+    "valid": true,
+    "payload": {
+        "description": "Temperature states",
+        "outsideAir": {
+            "value": 11,
+            "label": "outside air",
+            "unit": "°C"
         },
-        supplyAir: {
-            value: 20.5,
-            label: 'supply air',
-            unit: '°C'
+        "supplyAir": {
+            "value": 20.5,
+            "label": "supply air",
+            "unit": "°C"
         },
-        outgoingAir: {
-            value: 19,
-            label: 'outgoing air',
-            unit: '°C'
+        "outgoingAir": {
+            "value": 19,
+            "label": "outgoing air",
+            "unit": "°C"
         },
-        exhaustAir: {
-            value: 11.5,
-            label: 'exhaust air',
-            unit: '°C'
+        "exhaustAir": {
+            "value": 11.5,
+            "label": "exhaust air",
+            "unit": "°C"
         }
     }
 }
 ```
 
-### getFaults
-___
+#### getFaults
 
 Request operation faults. No parameter required.
 
@@ -465,56 +458,55 @@ getFaults(callback);
 
 ```json
 {
-    type: 'RES',
-    valid: true,
-    payload: {
-        description: 'Operating hours',
-        away: {
-            value: 13492,
-            label: 'away',
-            unit: 'h'
+    "type": "RES",
+    "valid": true,
+    "payload": {
+        "description": "Operating hours",
+        "away": {
+            "value": 13492,
+            "label": "away",
+            "unit": "h"
         },
-        low: {
-            value: 12833,
-            label: 'low',
-            unit: 'h'
+        "low": {
+            "value": 12833,
+            "label": "low",
+            "unit": "h"
+        },        
+        "middle": {
+            "value": 7699,
+            "label": "middle",
+            "unit": "h"
         },
-        middle: {
-            value: 7699,
-            label: 'middle',
-            unit: 'h'
+        "frostProtection": {
+            "value": 662,
+            "label": "frost protection",
+            "unit": "h"
         },
-        frostProtection: {
-            value: 662,
-            label: 'frost protection',
-            unit: 'h'
+        "preHeating": {
+            "value": 0,
+            "label": "preheating",
+            "unit": "h"
         },
-        preHeating: {
-            value: 0,
-            label: 'preheating',
-            unit: 'h'
+        "bypassOpen": {
+            "value": 10008,
+            "label": "bypass open",
+            "unit": "h"
         },
-        bypassOpen: {
-            value: 10008,
-            label: 'bypass open',
-            unit: 'h'
+        "filter": {
+            "value": 1824,
+            "label": "filter",
+            "unit": "h"
         },
-        filter: {
-            value: 1824,
-            label: 'filter',
-            unit: 'h'
-        },
-        high: {
-            value: 1068,
-            label: 'high',
-            unit: 'h'
+        "high": {
+            "value": 1068,
+            "label": "high",
+            "unit": "h"
         }
     }
 }
 ```
 
-### setLevel
-___
+#### setLevel
 
 Set the ventilation level.
 
@@ -534,8 +526,7 @@ setLevel('high', callback);
 }
 ```
 
-### setComfortTemperature
-___
+#### setComfortTemperature
 
 Set the ventilation level.
 
@@ -553,8 +544,7 @@ setComfortTemperature(20, callback);
 }
 ```
 
-### setVentilationLevel
-___
+#### setVentilationLevel
 
 Set the rotaition speed of the different ventilation levels for supply and exhaust fan.
 
@@ -579,8 +569,7 @@ setVentilationLevel(15, 35, 50, 70, 15, 35, 50, 70, callback);
 }
 ```
 
-### reset
-___
+#### reset
 
 Reset faults/settings/filter timer or run self test.
 
