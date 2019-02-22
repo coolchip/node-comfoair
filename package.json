@@ -1,0 +1,44 @@
+{
+  "name": "comfoair",
+  "version": "0.0.1",
+  "description": "Library to control a Zehnder Comfoair 350 and similar ventilation devices",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coolchip/node-comfoair.git"
+  },
+  "keywords": [
+    "node",
+    "zehnder",
+    "comfoair",
+    "ca350",
+    "storkair",
+    "wernig",
+    "santos",
+    "paul"
+  ],
+  "author": "Sebastian Balling",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/coolchip/node-comfoair/issues"
+  },
+  "homepage": "https://github.com/coolchip/node-comfoair#readme",
+  "dependencies": {
+    "serialport": "^7.1.4"
+  },
+  "devDependencies": {
+    "eslint": "^5.14.1",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-mocha": "^5.3.0",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-require-path-exists": "^1.1.9",
+    "eslint-plugin-standard": "^4.0.0",
+    "mocha": "^6.0.0",
+    "streamtest": "^1.2.4"
+  }
+}
