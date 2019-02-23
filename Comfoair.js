@@ -137,12 +137,12 @@ class Comfoair extends Duplex {
         return this._send('getVentilationLevel', {}, cb);
     }
 
-    getTemparatures(cb) {
-        return this._send('getTemparatures', {}, cb);
+    getTemperatures(cb) {
+        return this._send('getTemperatures', {}, cb);
     }
 
-    getTemparatureStates(cb) {
-        return this._send('getTemparatureStates', {}, cb);
+    getTemperatureStates(cb) {
+        return this._send('getTemperatureStates', {}, cb);
     }
 
     getFaults(cb) {

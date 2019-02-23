@@ -340,7 +340,7 @@ const commands = [
         }]
     },
     {
-        name: 'getTemparatures',
+        name: 'getTemperatures',
         label: 'Temperatures',
         command: [0x00, 0xD1],
         arg: [],
@@ -401,7 +401,7 @@ const commands = [
         }]
     },
     {
-        name: 'getTemparatureStates',
+        name: 'getTemperatureStates',
         label: 'Temperature states',
         command: [0x00, 0x0F],
         arg: [],
