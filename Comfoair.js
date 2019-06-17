@@ -184,7 +184,7 @@ class Comfoair extends Duplex {
     }
 
     runCommand(commandName, params, cb) {
-        return _send(commandName, params, cb);
+        return this._send(commandName, params, cb);
     }
 
     _send(commandName, params, cb) {
