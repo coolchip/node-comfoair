@@ -96,7 +96,7 @@ ventilationConnector.on('data', chunk => {
 const command = {
     name: 'setLevel',
     params: {
-        level
+        level: 'high'
     }
 });
 
@@ -550,11 +550,11 @@ Response
 
 Set the ventilation level.
 
-| Parameter | Type          | Description                              |
-|:----------|:--------------|:-----------------------------------------|
-| level     | string/number | 'away', 'low', 'middle', 'high', 1, 2, 3 |
+| Parameter | Type          | Description                                         |
+|:----------|:--------------|:----------------------------------------------------|
+| level     | string/number | 'away', 'low', 'middle', 'high', 0, 1, 2, 3, 'auto' |
 
-Where 'low' is the same as 1 and so on. The numbers 1 to 3 can also be passed als string.
+Where 'away' is the same as 0, 'low' is the same as 1 and so on. The numbers 0 to 3 can also be passed als string. The setting 'auto' seems to be for the external Panel for the ventilation system.
 
 ```javascript
 setLevel('high', callback);

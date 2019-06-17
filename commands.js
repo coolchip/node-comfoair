@@ -78,11 +78,15 @@ const writer = {
         return [value ? 0x01 : 0x00];
     },
     levelEnum(level) {
+        if (level == null) throw new Error('level not set');
         const levels = [{
             key: 'auto',
             value: 0x00
         }, {
             key: 'away',
+            value: 0x01
+        }, {
+            key: '0',
             value: 0x01
         }, {
             key: 'low',
@@ -108,7 +112,7 @@ const writer = {
         if (match) {
             return [match.value];
         }
-        throw new Error('missing or unknown level');
+        throw new Error(`unknown level: ${level}`);
     },
 };
 
