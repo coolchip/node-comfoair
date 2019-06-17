@@ -357,12 +357,12 @@ Response
 }
 ```
 
-#### getTemparatures
+#### getTemperatures
 
 Request current temperatures. No parameter required.
 
 ```javascript
-getTemparatures(callback);
+getTemperatures(callback);
 ```
 
 Response
@@ -421,12 +421,12 @@ Response
 }
 ```
 
-#### getTemparatureStates
+#### getTemperatureStates
 
 Request temperature states. No parameter required.
 
 ```javascript
-getTemparatureStates(callback);
+getTemperatureStates(callback);
 ```
 
 Response
