@@ -115,6 +115,8 @@ Request bootloader version and device type. No parameter required.
 getBootloaderVersion(callback);
 ```
 
+Response
+
 ```json
 {
     "type": "RES",
@@ -149,6 +151,8 @@ Request firmware version and device type. No parameter required.
 getFirmwareVersion(callback);
 ```
 
+Response
+
 ```json
 {
     "type": "RES",
@@ -182,6 +186,8 @@ Request state of the supply and the exhaust fan. No parameter required.
 ```javascript
 getFanState(callback);
 ```
+
+Response
 
 ```json
 {
@@ -220,6 +226,8 @@ Request operating hours of the different modes. No parameter required.
 ```javascript
 getOperatingHours(callback);
 ```
+
+Response
 
 ```json
 {
@@ -279,6 +287,8 @@ Request ventilation levels. No parameter required.
 getVentilationLevel(callback);
 ```
 
+Response
+
 ```json
 {
     "type": "RES",
@@ -328,7 +338,6 @@ getVentilationLevel(callback);
         "currentLevel": {
             "value": 1,
             "label": "Current ventilation level",
-            "unit": "%"
         },
         "supplyFanRunning": {
             "value": true,
@@ -355,6 +364,8 @@ Request current temperatures. No parameter required.
 ```javascript
 getTemparatures(callback);
 ```
+
+Response
 
 ```json
 {
@@ -418,6 +429,8 @@ Request temperature states. No parameter required.
 getTemparatureStates(callback);
 ```
 
+Response
+
 ```json
 {
     "type": "RES",
@@ -456,53 +469,80 @@ Request operation faults. No parameter required.
 getFaults(callback);
 ```
 
+Response
+
 ```json
-{
-    "type": "RES",
-    "valid": true,
-    "payload": {
-        "description": "Operating hours",
-        "away": {
-            "value": 13492,
-            "label": "away",
-            "unit": "h"
-        },
-        "low": {
-            "value": 12833,
-            "label": "low",
-            "unit": "h"
-        },        
-        "middle": {
-            "value": 7699,
-            "label": "middle",
-            "unit": "h"
-        },
-        "frostProtection": {
-            "value": 662,
-            "label": "frost protection",
-            "unit": "h"
-        },
-        "preHeating": {
-            "value": 0,
-            "label": "preheating",
-            "unit": "h"
-        },
-        "bypassOpen": {
-            "value": 10008,
-            "label": "bypass open",
-            "unit": "h"
-        },
-        "filter": {
-            "value": 1824,
-            "label": "filter",
-            "unit": "h"
-        },
-        "high": {
-            "value": 1068,
-            "label": "high",
-            "unit": "h"
-        }
-    }
+{  
+   "description":"Operating faults",
+   "currentErrorA":{  
+      "value":"A0",
+      "label":"current error A"
+   },
+   "currentErrorE":{  
+      "value":0,
+      "label":"current error E"
+   },
+   "lastErrorA":{  
+      "value":"A0",
+      "label":"last error A"
+   },
+   "lastErrorE":{  
+      "value":0,
+      "label":"last error E"
+   },
+   "penultimateErrorA":{  
+      "value":"A0",
+      "label":"penultimate error A"
+   },
+   "penultimateErrorE":{  
+      "value":0,
+      "label":"penultimate error E"
+   },
+   "antepenultimateErrorA":{  
+      "value":"A0",
+      "label":"antepenultimate error A"
+   },
+   "antepenultimateErrorE":{  
+      "value":0,
+      "label":"antepenultimate error E"
+   },
+   "replaceFilter":{  
+      "value":true,
+      "label":"replace filter"
+   },
+   "currentErrorEA":{  
+      "value":0,
+      "label":"current error EA"
+   },
+   "lastErrorEA":{  
+      "value":0,
+      "label":"last error EA"
+   },
+   "penultimateErrorEA":{  
+      "value":0,
+      "label":"penultimate error EA"
+   },
+   "antepenultimateErrorEA":{  
+      "value":0,
+      "label":"antepenultimate error EA"
+   },
+   "currentErrorAHigh":{  
+      "value":0,
+      "label":"current error A high"
+   },
+   "lastErrorAHigh":{  
+      "value":0,
+      "label":"last error A high"
+   },
+   "penultimateErrorAHigh":{  
+      "value":0,
+      "label":"penultimate error A high"
+   },
+   "antepenultimateErrorAHigh":{  
+      "value":0,
+      "label":"antepenultimate error A high"
+   },
+   "type":"RES"
 }
 ```
 
@@ -519,6 +559,8 @@ Where 'low' is the same as 1 and so on. The numbers 1 to 3 can also be passed al
 ```javascript
 setLevel('high', callback);
 ```
+
+Response
 
 ```json
 {
@@ -537,6 +579,8 @@ Set the ventilation level.
 ```javascript
 setComfortTemperature(20, callback);
 ```
+
+Response
 
 ```json
 {
@@ -563,6 +607,8 @@ Set the rotaition speed of the different ventilation levels for supply and exhau
 setVentilationLevel(15, 35, 50, 70, 15, 35, 50, 70, callback);
 ```
 
+Response
+
 ```json
 {
     "type": "ACK"
@@ -583,6 +629,8 @@ Reset faults/settings/filter timer or run self test.
 ```javascript
 reset(false, false, false, true, callback);
 ```
+
+Response
 
 ```json
 {

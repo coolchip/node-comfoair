@@ -313,7 +313,6 @@ const commands = [
             reader: reader.int8,
             name: 'supplyCurrent',
             label: 'Current supply fan level',
-            unit: '%'
         }, {
             length: 1,
             reader: reader.int8,

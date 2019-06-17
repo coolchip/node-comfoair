@@ -183,6 +183,10 @@ class Comfoair extends Duplex {
         }, cb);
     }
 
+    runCommand(commandName, params, cb) {
+        return _send(commandName, params, cb);
+    }
+
     _send(commandName, params, cb) {
         const commandHandler = commands.byName(commandName);
 
