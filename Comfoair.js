@@ -13,7 +13,7 @@ const endSeq = Buffer.from([0x07, 0x0F]);
 const ackSeq = Buffer.from([0x07, 0xF3]);
 
 class Comfoair extends Duplex {
-    constructor(options) {
+    constructor(options, cb) {
         super({
             objectMode: true
         });
@@ -24,18 +24,20 @@ class Comfoair extends Duplex {
 
         this.port = new SerialPort(options.port, {
             baudRate: options.baud || 9600
+        }, cb);
+
+        this.port.on('open', () => {
+            this.emit('open');
         });
 
-        this.open = false;
-        this.port.on('open', err => {
-            if (err) return console.error(err.message);
-            this.open = true;
-        });
-
-        this.port.on('close', err => {
+        this.port.on('close', () => {
             // push the EOF-signaling 'null' chunk
-            this.open = false;
             this.push(null);
+            this.emit('close');
+        });
+
+        this.port.on('error', err => {
+            this.emit('error', err);
         });
 
         // set up pipe for parsing messages from comfoair
@@ -73,14 +75,13 @@ class Comfoair extends Duplex {
 
     close(cb) {
         this.port.close(cb);
-        this.port = null;
     }
 
     _read(bytesToRead) {
         const pool = this.readArr;
 
         // if we have no data, wait till we get some
-        if (!this.open || pool.length === 0) {
+        if (!this.port.isOpen || pool.length === 0) {
             this.parser.once('data', () => {
                 this._read(bytesToRead);
             });
@@ -97,9 +98,9 @@ class Comfoair extends Duplex {
         }
     }
 
-    _write(chunk, encoding, cb) {
+    _write(chunk, cb) {
         const commandHandler = commands.byName(chunk.name);
-        if (!commandHandler) return cb(new Error('unknown command'));
+        if (!commandHandler) return cb(new Error('Unknown Comfoair command'));
 
         const command = Buffer.from(commandHandler.command);
         const reducer = (accumulator, currentValue) => {
@@ -193,7 +194,9 @@ class Comfoair extends Duplex {
         // set up timeout, if we get no answer
         const timeoutHandler = () => {
             this.parser.removeListener('data', dataHandler);
-            return cb(new Error('Timeout'));
+            const err = new Error(`Timeout after ${this.options.timeout/1000} seconds while waiting for data from Comfoair`);
+            if (typeof cb === 'function') return cb(err);
+            this.emit('error', err);
         };
         const timerId = setTimeout(timeoutHandler, this.options.timeout);
 
@@ -212,10 +215,11 @@ class Comfoair extends Duplex {
             name: commandName,
             params
         };
-        this._write(chunk, null, (err) => {
+        this._write(chunk, (err) => {
             if (err) {
                 this.parser.removeListener('data', dataHandler);
-                return cb(err);
+                if (typeof cb === 'function') return cb(err);
+                this.emit('error', err);
             }
         });
     }
