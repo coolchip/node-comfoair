@@ -217,6 +217,7 @@ class Comfoair extends Duplex {
         };
         this._write(chunk, (err) => {
             if (err) {
+                clearTimeout(timerId);
                 this.parser.removeListener('data', dataHandler);
                 if (typeof cb === 'function') return cb(err);
                 this.emit('error', err);
