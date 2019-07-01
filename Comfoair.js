@@ -126,6 +126,10 @@ class Comfoair extends Duplex {
         return this._send('getFirmwareVersion', {}, cb);
     }
 
+    getBypassState(cb){
+	return this._send('getBypassState', {}, cb);
+    }
+    
     getFanState(cb) {
         return this._send('getFanState', {}, cb);
     }
