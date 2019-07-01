@@ -41,7 +41,7 @@ const reader = {
     },
     preheat(data) {
 	const Bit2Val = data.readInt8(0);
-	if (Bit2Val == 0) return 'closed';
+	if (Bit2Val == 0) return 'Closed';
 	else if (Bit2Val == 1) return 'Opened';
 	else return 'Unknown';
     },
