@@ -1,8 +1,8 @@
 'use strict';
 
 const assert = require('assert');
-//const StreamTest = require('streamtest');
-//const UnmaskStream = require('../UnmaskStream');
+// const StreamTest = require('streamtest');
+// const UnmaskStream = require('../UnmaskStream');
 
 describe('Array', function () {
     describe('#indexOf()', function () {

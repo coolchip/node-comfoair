@@ -8,12 +8,12 @@ const reader = {
         return data.readInt16BE(0);
     },
     int24(data) {
-        //prepend empty byte to get a 32 bit value
+        // prepend empty byte to get a 32 bit value
         data = Buffer.concat([Buffer.from([0]), data]);
         return data.readInt32BE(0);
     },
     bool(data) {
-        return data.readInt8(0) ? true : false;
+        return Boolean(data.readInt8(0));
     },
     text(data) {
         return data.toString('ascii');
@@ -26,7 +26,7 @@ const reader = {
     },
     sensorsConnected(data) {
         const Bit2Bool = function (field, bit) {
-            return field & bit ? true : false;
+            return Boolean(field & bit);
         };
         const field = data.readInt8(0);
         return {
@@ -36,7 +36,7 @@ const reader = {
             'exhaust air': Bit2Bool(field, 0x08),
             'ground heat exchanger': Bit2Bool(field, 0x10),
             'preheater': Bit2Bool(field, 0x20),
-            'cooker hood': Bit2Bool(field, 0x40),
+            'cooker hood': Bit2Bool(field, 0x40)
         };
     },
     preheat(data) {
@@ -66,7 +66,7 @@ const reader = {
         return data.readInt8(0);
     },
     filterState(data) {
-        return data.readInt8(0) ? true : false;
+        return Boolean(data.readInt8(0));
     }
 };
 
@@ -112,14 +112,14 @@ const writer = {
         }, {
             key: '3',
             value: 0x04
-        }, ];
+        }];
         level = level.toString();
         const match = levels.find(item => item.key === level);
         if (match) {
             return [match.value];
         }
         throw new Error(`unknown level: ${level}`);
-    },
+    }
 };
 
 const commands = [
@@ -353,7 +353,7 @@ const commands = [
             length: 1,
             reader: reader.int8,
             name: 'supplyCurrent',
-            label: 'Current supply fan level',
+            label: 'Current supply fan level'
         }, {
             length: 1,
             reader: reader.int8,
@@ -364,7 +364,7 @@ const commands = [
             length: 1,
             reader: reader.bool,
             name: 'supplyFanRunning',
-            label: 'Supply fan is running',
+            label: 'Supply fan is running'
         }, {
             length: 1,
             reader: reader.int8,
@@ -419,7 +419,7 @@ const commands = [
             length: 1,
             reader: reader.sensorsConnected,
             name: 'sensorConnected',
-            label: 'sensor connected',
+            label: 'sensor connected'
         }, {
             length: 1,
             reader: reader.temperature,
@@ -482,87 +482,87 @@ const commands = [
             length: 1,
             reader: reader.errorA,
             name: 'currentErrorA',
-            label: 'current error A',
+            label: 'current error A'
         }, {
             length: 1,
             reader: reader.errorE,
             name: 'currentErrorE',
-            label: 'current error E',
+            label: 'current error E'
         }, {
             length: 1,
             reader: reader.errorA,
             name: 'lastErrorA',
-            label: 'last error A',
+            label: 'last error A'
         }, {
             length: 1,
             reader: reader.errorE,
             name: 'lastErrorE',
-            label: 'last error E',
+            label: 'last error E'
         }, {
             length: 1,
             reader: reader.errorA,
             name: 'penultimateErrorA',
-            label: 'penultimate error A',
+            label: 'penultimate error A'
         }, {
             length: 1,
             reader: reader.errorE,
             name: 'penultimateErrorE',
-            label: 'penultimate error E',
+            label: 'penultimate error E'
         }, {
             length: 1,
             reader: reader.errorA,
             name: 'antepenultimateErrorA',
-            label: 'antepenultimate error A',
+            label: 'antepenultimate error A'
         }, {
             length: 1,
             reader: reader.errorE,
             name: 'antepenultimateErrorE',
-            label: 'antepenultimate error E',
+            label: 'antepenultimate error E'
         }, {
             length: 1,
             reader: reader.filterState,
             name: 'replaceFilter',
-            label: 'replace filter',
+            label: 'replace filter'
         }, {
             length: 1,
             reader: reader.errorEA,
             name: 'currentErrorEA',
-            label: 'current error EA',
+            label: 'current error EA'
         }, {
             length: 1,
             reader: reader.errorEA,
             name: 'lastErrorEA',
-            label: 'last error EA',
+            label: 'last error EA'
         }, {
             length: 1,
             reader: reader.errorEA,
             name: 'penultimateErrorEA',
-            label: 'penultimate error EA',
+            label: 'penultimate error EA'
         }, {
             length: 1,
             reader: reader.errorEA,
             name: 'antepenultimateErrorEA',
-            label: 'antepenultimate error EA',
+            label: 'antepenultimate error EA'
         }, {
             length: 1,
             reader: reader.errorAhigh,
             name: 'currentErrorAHigh',
-            label: 'current error A high',
+            label: 'current error A high'
         }, {
             length: 1,
             reader: reader.errorAhigh,
             name: 'lastErrorAHigh',
-            label: 'last error A high',
+            label: 'last error A high'
         }, {
             length: 1,
             reader: reader.errorAhigh,
             name: 'penultimateErrorAHigh',
-            label: 'penultimate error A high',
+            label: 'penultimate error A high'
         }, {
             length: 1,
             reader: reader.errorAhigh,
             name: 'antepenultimateErrorAHigh',
-            label: 'antepenultimate error A high',
+            label: 'antepenultimate error A high'
         }]
     },
     // ****************
@@ -575,7 +575,7 @@ const commands = [
         arg: [{
             writer: writer.levelEnum,
             name: 'level',
-            label: 'level',
+            label: 'level'
         }]
     },
     {
@@ -585,7 +585,7 @@ const commands = [
         arg: [{
             writer: writer.temperature,
             name: 'temperature',
-            label: 'comfort temperature',
+            label: 'comfort temperature'
         }]
     },
     {
@@ -641,19 +641,19 @@ const commands = [
         arg: [{
             writer: writer.bool,
             name: 'resetFaults',
-            label: 'reset faults',
+            label: 'reset faults'
         }, {
             writer: writer.bool,
             name: 'resetSettings',
-            label: 'reset settings',
+            label: 'reset settings'
         }, {
             writer: writer.bool,
             name: 'runSelfTest',
-            label: 'run self test',
+            label: 'run self test'
         }, {
             writer: writer.bool,
             name: 'resetFilterTimer',
-            label: 'reset filter operating hours',
+            label: 'reset filter operating hours'
         }]
     }
 ];

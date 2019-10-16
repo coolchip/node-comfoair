@@ -21,14 +21,14 @@ const calcCheckSum = function (data) {
     let last = 0;
     for (const b of data) {
         if (b === 7 && last === 7) {
-            //two successive sevens are added only one time
+            // two successive sevens are added only one time
             last = 0;
         } else {
             sum += b;
             last = b;
         }
     }
-    //return least significant byte
+    // return least significant byte
     return sum & 0xFF;
 };
 
@@ -60,7 +60,7 @@ const sendAcknowledge = function (callback) {
 let res = Buffer.from([]);
 const outFile = './operatingHours.bin';
 
-//Switches the port into "flowing mode"
+// Switches the port into "flowing mode"
 port.on('data', (data) => {
     console.log('res:', data);
 

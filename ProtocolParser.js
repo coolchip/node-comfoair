@@ -23,12 +23,12 @@ class ProtocolParser extends Transform {
     }
 
     isChecksumValid(data, checksum) {
-        //start value is 173
+        // start value is 173
         let sum = 173 - checksum;
         for (const b of data) {
             sum += b;
         }
-        //true, if least significant byte is zero
+        // true, if least significant byte is zero
         return (sum & 0xFF) === 0;
     }
 
@@ -39,7 +39,7 @@ class ProtocolParser extends Transform {
             const reducer = (accumulator, currentParam) => {
                 accumulator[currentParam.name] = {
                     value: currentParam.reader(data.slice(position, position + currentParam.length)),
-                    label: currentParam.label,
+                    label: currentParam.label
                 };
                 if (currentParam.unit) accumulator[currentParam.name].unit = currentParam.unit;
                 position += currentParam.length;
@@ -93,7 +93,7 @@ class ProtocolParser extends Transform {
                         this.push({
                             type,
                             valid,
-                            payload,
+                            payload
                         });
                     }
                     buffer = buffer.slice(endPosition + 2);

@@ -60,12 +60,12 @@ class Comfoair extends Duplex {
     }
 
     _calcCheckSum(data) {
-        //start value is 173
+        // start value is 173
         let sum = 173;
         for (const b of data) {
             sum += b;
         }
-        //return least significant byte
+        // return least significant byte
         return sum & 0xFF;
     }
 
@@ -198,7 +198,7 @@ class Comfoair extends Duplex {
         // set up timeout, if we get no answer
         const timeoutHandler = () => {
             this.parser.removeListener('data', dataHandler);
-            const err = new Error(`Timeout after ${this.options.timeout/1000} seconds while waiting for data from Comfoair`);
+            const err = new Error(`Timeout after ${this.options.timeout / 1000} seconds while waiting for data from Comfoair`);
             if (typeof cb === 'function') return cb(err);
             this.emit('error', err);
         };
@@ -206,7 +206,7 @@ class Comfoair extends Duplex {
 
         // use callback to return received chunks
         const dataHandler = (chunk) => {
-            const expectAck = commandHandler.response ? false : true;
+            const expectAck = !commandHandler.response;
             if (chunk.type === 'ACK' && expectAck === false) return;
             clearTimeout(timerId);
             this.parser.removeListener('data', dataHandler);
