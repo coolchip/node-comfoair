@@ -32,6 +32,7 @@
             "asyncArrow": "always"
         }],
         "quotes": ["error", "single"],
+        "quote-props": ["error", "consistent-as-needed"],
         "padded-blocks": ["error", {
             "blocks": "never"
         }],

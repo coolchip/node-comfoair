@@ -39,11 +39,16 @@ const reader = {
             'cooker hood': Bit2Bool(field, 0x40)
         };
     },
+    bypass(data) {
+        const bypassValue = data.readInt8(0);
+        if (bypassValue === 0xFF) return undefined;
+        return bypassValue;
+    },
     preheat(data) {
-	const Bit2Val = data.readInt8(0);
-	if (Bit2Val == 0) return 'Closed';
-	else if (Bit2Val == 1) return 'Opened';
-	else return 'Unknown';
+        const preheatValue = data.readInt8(0);
+        if (preheatValue === 0) return 'Closed';
+        if (preheatValue === 1) return 'Open';
+        return 'Unknown';
     },
     errorA(data) {
         const getBit = function (value) {
@@ -183,35 +188,35 @@ const commands = [
         }]
     },
     {
-	name: 'getBypassState',
-	label: 'Bypass state',
-	command: [0x00, 0x0D],
-	arg: [],
-	response: [0x00, 0x0E],
-	description: [{
-	    length: 1,
-	    reader: reader.int8,
-	    name: 'bypass',
-	    label: 'Bypass',
-	    unit: '%'
-	}, {
-	    length: 1,
-	    reader: reader.preheat,
-	    name: 'preheat',
-	    lable: 'Preheat'
-	}, {
-	    length: 1,
-	    reader: reader.int8,
-	    name: 'bypassMotorCurrent',
-	    label: 'Bypass Motor Current',
-	    unit: 'A'
-	}, {
-	    length: 1,
-	    reader: reader.int8,
-	    name: 'preheatMotorCurrent',
-	    label: 'Preheat Motor Current',
-	    unit: 'A'
-	}]
+        name: 'getFlapState',
+        label: 'Flap state',
+        command: [0x00, 0x0D],
+        arg: [],
+        response: [0x00, 0x0E],
+        description: [{
+            length: 1,
+            reader: reader.bypass,
+            name: 'bypass',
+            label: 'Bypass',
+            unit: '%'
+        }, {
+            length: 1,
+            reader: reader.preheat,
+            name: 'preheat',
+            lable: 'Preheat'
+        }, {
+            length: 1,
+            reader: reader.int8,
+            name: 'bypassMotorCurrent',
+            label: 'Bypass Motor Current',
+            unit: 'A'
+        }, {
+            length: 1,
+            reader: reader.int8,
+            name: 'preheatMotorCurrent',
+            label: 'Preheat Motor Current',
+            unit: 'A'
+        }]
     },
     {
         name: 'getFanState',
