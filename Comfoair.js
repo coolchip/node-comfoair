@@ -4,12 +4,16 @@ const SerialPort = require('serialport');
 const {
     Duplex
 } = require('stream');
+const bufferReplace = require('buffer-replace');
 const commands = require('./commands');
 const ProtocolParser = require('./ProtocolParser');
 
 const startSeq = Buffer.from([0x07, 0xF0]);
 const endSeq = Buffer.from([0x07, 0x0F]);
 const ackSeq = Buffer.from([0x07, 0xF3]);
+
+const doubleSeven = Buffer.from([0x07, 0x07]);
+const singleSeven = Buffer.from([0x07]);
 
 class Comfoair extends Duplex {
     constructor(options, cb) {
@@ -111,8 +115,11 @@ class Comfoair extends Duplex {
         const msg = Buffer.concat([command, dataLength, data]);
         const checksum = Buffer.from([this._calcCheckSum(msg)]);
 
-        // frame message and send it to comfoair
-        const req = Buffer.concat([startSeq, msg, checksum, endSeq]);
+        // double 0x07 in data section to meet protocol specs
+        const escapedData = bufferReplace(data, singleSeven, doubleSeven);
+
+        // send message to comfoair
+        const req = Buffer.concat([startSeq, command, dataLength, escapedData, checksum, endSeq]);
         this.port.write(req, cb);
     }
 
