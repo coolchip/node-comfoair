@@ -15,11 +15,15 @@ const ackSeq = Buffer.from([0x07, 0xF3]);
 const doubleSeven = Buffer.from([0x07, 0x07]);
 const singleSeven = Buffer.from([0x07]);
 
+const waitBetweenCommands = 500;
+
 class Comfoair extends Duplex {
     constructor(options, cb) {
         super({
             objectMode: true
         });
+
+        this.queue = [];
 
         this.options = Object.assign({}, {
             timeout: 5000
@@ -77,6 +81,7 @@ class Comfoair extends Duplex {
 
     close(cb) {
         this.port.close(cb);
+        this.queue = [];
     }
 
     _read(bytesToRead) {
@@ -198,12 +203,33 @@ class Comfoair extends Duplex {
     }
 
     _send(commandName, params, cb) {
-        const commandHandler = commands.byName(commandName);
+        const queueLength = this.queue.push({
+            commandName,
+            params,
+            cb
+        });
+        if (queueLength === 1) setTimeout(this._sendFromQueue.bind(this), waitBetweenCommands);
+    }
+
+    _sendFromQueue() {
+        if (this.queue.length <= 0) return;
+        const {
+            commandName,
+            params,
+            cb
+        } = this.queue.pop();
+        const expectAck = commands.byName(commandName).response ? false : true;
+
+        // run next command if present
+        const triggerNextCommand = () => {
+            if (this.queue.length > 0) return setTimeout(this._sendFromQueue.bind(this), waitBetweenCommands);
+        };
 
         // set up timeout, if we get no answer
         const timeoutHandler = () => {
             this.parser.removeListener('data', dataHandler);
             const err = new Error(`Timeout after ${this.options.timeout / 1000} seconds while waiting for data from Comfoair`);
+            triggerNextCommand();
             if (typeof cb === 'function') return cb(err);
             this.emit('error', err);
         };
@@ -211,10 +237,10 @@ class Comfoair extends Duplex {
 
         // use callback to return received chunks
         const dataHandler = (chunk) => {
-            const expectAck = !commandHandler.response;
             if (chunk.type === 'ACK' && expectAck === false) return;
             clearTimeout(timerId);
             this.parser.removeListener('data', dataHandler);
+            triggerNextCommand();
             cb(null, chunk);
         };
         this.parser.on('data', dataHandler);
@@ -236,3 +262,4 @@ class Comfoair extends Duplex {
 }
 
 module.exports = Comfoair;
+
