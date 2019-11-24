@@ -24,9 +24,9 @@ class ProtocolParser extends Transform {
 
     isChecksumValid(data, checksum) {
         // start value is 173
-        let sum = 173 - checksum;
+        let sum = checksum - 173;
         for (const b of data) {
-            sum += b;
+            sum -= b;
         }
         // true, if least significant byte is zero
         return (sum & 0xFF) === 0;
@@ -62,7 +62,8 @@ class ProtocolParser extends Transform {
                 // found ack -> push, if necessary
                 if (this.config.passAcks) {
                     this.push({
-                        type: 'ACK'
+                        type: 'ACK',
+                        valid: true
                     });
                 }
                 buffer = buffer.slice(2);
