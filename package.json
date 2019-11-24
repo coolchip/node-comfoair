@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/coolchip/node-comfoair#readme",
   "dependencies": {
+    "buffer-replace": "^1.0.0",
     "serialport": "^7.1.5"
   },
   "devDependencies": {

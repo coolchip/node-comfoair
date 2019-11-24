@@ -6,7 +6,6 @@ const {
 } = require('stream');
 const commands = require('./commands');
 const ProtocolParser = require('./ProtocolParser');
-const UnmaskStream = require('./UnmaskStream');
 
 const startSeq = Buffer.from([0x07, 0xF0]);
 const endSeq = Buffer.from([0x07, 0x0F]);
@@ -41,12 +40,11 @@ class Comfoair extends Duplex {
         });
 
         // set up pipe for parsing messages from comfoair
-        const unmaskStream = new UnmaskStream();
         const protocolParser = new ProtocolParser({
             passAcks: true,
             debug: options.debug || false
         });
-        this.parser = this.port.pipe(unmaskStream).pipe(protocolParser);
+        this.parser = this.port.pipe(protocolParser);
 
         // buffer every received package
         this.readArr = [];

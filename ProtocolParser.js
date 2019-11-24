@@ -1,11 +1,15 @@
 'use strict';
 
 const Transform = require('stream').Transform;
+const bufferReplace = require('buffer-replace');
 const commands = require('./commands');
 
 const startSeq = Buffer.from([0x07, 0xF0]);
 const endSeq = Buffer.from([0x07, 0x0F]);
 const ackSeq = Buffer.from([0x07, 0xF3]);
+
+const doubleSeven = Buffer.from([0x07, 0x07]);
+const singleSeven = Buffer.from([0x07]);
 
 // parse a chunk from comfoair
 class ProtocolParser extends Transform {
@@ -15,8 +19,7 @@ class ProtocolParser extends Transform {
         });
 
         this.config = Object.assign({}, {
-            passAcks: true,
-            debug: false
+            passAcks: true
         }, config);
 
         this.buffer = Buffer.alloc(0);
@@ -53,6 +56,54 @@ class ProtocolParser extends Transform {
         return {};
     }
 
+    parsePayload(payload) {
+        const response = payload.slice(0, 2);
+        const telegramLength = payload.slice(2, 3);
+        const type = 'RES';
+
+        const invalid = (error) => {
+            return {
+                type,
+                valid: false,
+                payload: {},
+                error
+            };
+        }
+
+        // break if length = 0 ... don't know why this happens. when it happens, 
+        // length is in the next byte. But we ignore this.
+        if (telegramLength[0] === 0) {
+            return invalid('Frame length is null');
+        }
+
+        // search and replace double 0x07 in data section
+        const data = payload.slice(3, payload.length - 1);
+        const cleanData = bufferReplace(data, doubleSeven, singleSeven);
+        if (telegramLength[0] !== cleanData.length) {
+            return invalid('Invalid frame length');
+        }
+
+        // check sum
+        const checksum = payload.readUInt8(payload.length - 1);
+        const cleanPayload = Buffer.concat([response, telegramLength, cleanData]);
+        const valid = this.isChecksumValid(cleanPayload, checksum);
+        if (!valid) {
+            return invalid(`Checksum is invalid`);
+        }
+
+        // parse data
+        try {
+            const parsedData = this.parseData(cleanData, response);
+            return {
+                type,
+                valid,
+                payload: parsedData,
+            };
+        } catch (e) {
+            return invalid(`Error while parsing: ${e.message}]`);
+        }
+    }
+
     _transform(chunk, encoding, cb) {
         let buffer = Buffer.concat([this.buffer, chunk]);
 
@@ -68,38 +119,16 @@ class ProtocolParser extends Transform {
                 }
                 buffer = buffer.slice(2);
             } else if (head.equals(startSeq)) {
-                // found beginning of a response -> search for end
-                let endPosition;
-                if ((endPosition = buffer.indexOf(endSeq, 2)) !== -1) {
-                    // found end -> push full message
-                    const type = 'RES';
-                    const response = Array.prototype.slice.call(buffer, 2, 4);
-                    const telegramLength = buffer.readInt8(4);
-                    const data = buffer.slice(5, 5 + telegramLength);
-                    const payload = this.parseData(data, response);
-                    const checksum = buffer.readInt8(5 + telegramLength);
-                    const valid = this.isChecksumValid(buffer.slice(2, buffer.length - 3), checksum);
-
-                    if (this.config.debug) {
-                        this.push({
-                            type,
-                            response,
-                            telegramLength,
-                            data,
-                            payload,
-                            checksum,
-                            valid
-                        });
-                    } else {
-                        this.push({
-                            type,
-                            valid,
-                            payload
-                        });
-                    }
-                    buffer = buffer.slice(endPosition + 2);
+                // found start of a response -> search for end
+                const indexEndSeq = buffer.indexOf(endSeq, 2)
+                if (indexEndSeq !== -1) {
+                    // found end -> push parsed payload
+                    const payload = buffer.slice(2, indexEndSeq);
+                    const parsedPayload = this.parsePayload(payload);
+                    this.push(parsedPayload);
+                    buffer = buffer.slice(indexEndSeq + 2);
                 } else {
-                    // found beginning without end -> wait for more data
+                    // found start without end -> wait for more data
                     break;
                 }
             } else {
