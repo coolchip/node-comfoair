@@ -735,3 +735,27 @@ runCommand(commandName, params, (err, response) => {
     console.log(response);
 });
 ```
+
+## Migration to 1.x.x
+
+There are only tiny API changes. The main difference is in using this module in streaming Mode. In Version 0.x.x you can simply use the same Module for function calls and streaming. Starting with 1.0.0 you have to choose the streaming module explicit.
+
+0.x.x
+```javascript
+const Comfoair = require('comfoair');
+
+const ventilationStream = new Comfoair({
+    port: '/dev/ttyUSB0',
+    baud: 9600
+});
+```
+
+1.x.x
+```javascript
+const ComfoairStream = require('comfoair').ComfoairStream;
+
+const ventilationStream = new ComfoairStream({
+    port: '/dev/ttyUSB0',
+    baud: 9600
+});
+```
