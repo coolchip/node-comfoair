@@ -49,7 +49,13 @@ const reader = {
         if (preheatValue === 0) return 'Closed';
         if (preheatValue === 1) return 'Open';
         if (preheatValue === 2) return 'Unknown';
-        return undefined;
+        return preheatValue;
+    },
+    summerMode(data) {
+        const mode = data.readInt16BE(0);
+        if (mode === 0) return 'No (winter)';
+        if (mode === 1) return 'summer';
+        return mode;
     },
     errorA(data) {
         const getBit = function (value) {
@@ -249,6 +255,40 @@ const commands = [
             name: 'rotaitionsOutgoing',
             label: 'Rotaitions outgoing',
             unit: 'rpm'
+        }]
+    },
+
+    {
+        name: 'getBypassControllerState',
+        label: 'Bypass controller state',
+        command: [0x00, 0xDF],
+        arg: [],
+        response: [0x00, 0xE0],
+        description: [{
+            length: 2,
+            reader: reader.int16,
+            name: 'ignore',
+            label: 'ignore'
+        }, {
+            length: 1,
+            reader: reader.int8,
+            name: 'bypassCoefficient',
+            label: 'Bypass coefficient'
+        }, {
+            length: 1,
+            reader: reader.int8,
+            name: 'bypassLevel',
+            label: 'Bypass level'
+        }, {
+            length: 1,
+            reader: reader.int8,
+            name: 'bypassAdjustment',
+            label: 'Bypass adjustment'
+        }, {
+            length: 2,
+            reader: reader.summerMode,
+            name: 'summerMode',
+            label: 'Summer mode'
         }]
     },
     {

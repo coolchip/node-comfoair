@@ -64,6 +64,10 @@ class Comfoair extends EventEmitter {
         return this._enqueue('getFanState', {}, cb);
     }
 
+    getBypassControllerState(cb) {
+        return this._enqueue('getBypassControllerState', {}, cb);
+    }
+
     getOperatingHours(cb) {
         return this._enqueue('getOperatingHours', {}, cb);
     }
