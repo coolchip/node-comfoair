@@ -51,10 +51,26 @@ const byCall = function (level, cb) {
                             if (err) return handleError(err);
                             console.log(resp);
                             vent.getVentilationLevel((err, resp) => {
-                                vent.close();
                                 if (err) return handleError(err);
                                 console.log(resp);
-                                vent.close(cb);
+                                vent.getFanState((err, resp) => {
+                                    if (err) return handleError(err);
+                                    console.log(resp);
+                                    vent.getFlapState((err, resp) => {
+                                        if (err) return handleError(err);
+                                        console.log(resp);
+                                        vent.getFirmwareVersion((err, resp) => {
+                                            if (err) return handleError(err);
+                                            console.log(resp);
+                                            vent.getBypassControllerState((err, resp) => {
+                                                vent.close();
+                                                if (err) return handleError(err);
+                                                console.log(resp);
+                                                vent.close(cb);
+                                            });
+                                        });
+                                    });
+                                });
                             });
                         });
                     });
