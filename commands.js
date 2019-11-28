@@ -48,7 +48,8 @@ const reader = {
         const preheatValue = data.readInt8(0);
         if (preheatValue === 0) return 'Closed';
         if (preheatValue === 1) return 'Open';
-        return 'Unknown';
+        if (preheatValue === 2) return 'Unknown';
+        return undefined;
     },
     errorA(data) {
         const getBit = function (value) {
@@ -203,7 +204,7 @@ const commands = [
             length: 1,
             reader: reader.preheat,
             name: 'preheat',
-            lable: 'Preheat'
+            label: 'Preheat'
         }, {
             length: 1,
             reader: reader.int8,
