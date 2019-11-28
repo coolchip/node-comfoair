@@ -2,9 +2,9 @@
 
 ### Reads and controls ventilation devices like Zehnder ComfoAir 350 with **Node.js**
 
-[![npm version](https://badge.fury.io/js/comfoair.svg)](https://badge.fury.io/js/comfoair)
-[![Dependency Status](https://david-dm.org/coolchip/node-comfoair.svg)](https://david-dm.org/coolchip/node-comfoair)
-[![npm](https://img.shields.io/npm/l/comfoair.svg)](https://www.npmjs.com/package/comfoair)
+
+
+
 
 **Comfoair is an Open Source Node.js implementaion of the communication protocoll done and used by Zehnder. You can use this libary to control your personal ventialtion system.**
 
@@ -18,11 +18,13 @@ https://www.openhab.org/addons/bindings/comfoair1/), the fantastic [FHEM module 
 * Wernig/Santos G90-380
 * Paul 370 DC
 
-## How to use
+## Status
 
-Connect your unit via serial bus and configure the port in your code. The comfoair library using [serialport](https://github.com/node-serialport/node-serialport), so you can use every port (and syntax), that serialport is supporting. The speed (baud) should always be 9600, this is also default.
-If your ventilation device - like mine - is too far away from your controling system and you have lan/wlan access, you can pipe your serial port through ethernet with ser2net and socat. Look at this nice description for example: https://www.acmesystems.it/socat.
-The comfoair lib can either be uses as stream or simply by calling the given functions.
+| Category         | Status                                                                                                                    |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Version          | [![npm version](https://badge.fury.io/js/comfoair.svg)](https://badge.fury.io/js/comfoair)                                |
+| Dependencies     | [![Dependency Status](https://david-dm.org/coolchip/node-comfoair.svg)](https://david-dm.org/coolchip/node-comfoair)      |
+| License          | [![npm](https://img.shields.io/npm/l/comfoair.svg)](https://www.npmjs.com/package/comfoair)                               |
 
 ## Install
 
@@ -31,6 +33,12 @@ Simply
 ```bash
 npm install comfoair
 ```
+
+## How to use
+
+Connect your unit via serial bus and configure the port in your code. The comfoair library using [serialport](https://github.com/node-serialport/node-serialport), so you can use every port (and syntax), that serialport is supporting. The speed (baud) should always be 9600, this is also default.
+If your ventilation device - like mine - is too far away from your controling system and you have lan/wlan access, you can pipe your serial port through ethernet with ser2net and socat. Look at this nice description for example: https://www.acmesystems.it/socat.
+The comfoair lib can either be uses as stream or simply by calling the given functions.
 
 ## Examples
 
@@ -45,15 +53,28 @@ To get your firmware version and device name:
 ```javascript
 const Comfoair = require('comfoair');
 
-const ventilationConnector = new Comfoair({
+const ventilation = new Comfoair({
     port: '/dev/ttyUSB0',
     baud: 9600
 });
 
-ventilationConnector.getFirmwareVersion((err, resp) => {
-    ventilationConnector.close();
-    if (err) return console.error(err.message);
-    console.log(resp);
+ventilation.on('error', (err) => {
+    console.log('ERROR: ' + err.message);
+});
+
+ventilation.on('close', () => {
+    console.log('Connection to Comfoair closed');
+});
+
+ventilation.on('open', () => {
+    console.log('Connected to Comfoair :)');
+
+    ventilation.getTemperatures((err, resp) => {
+        if (err) console.log(err.message);
+        else console.log(resp);
+	
+	    ventilation.close();
+    });
 });
 ```
 
@@ -62,15 +83,28 @@ To set the ventilation level:
 ```javascript
 const Comfoair = require('comfoair');
 
-const ventilationConnector = new Comfoair({
+const ventilation = new Comfoair({
     port: '/dev/ttyUSB0',
     baud: 9600
 });
 
-ventilationConnector.setLevel('high', (err, resp) => {
-    ventilationConnector.close();
-    if (err) return console.error(err.message);
-    console.log(resp);
+ventilation.on('error', (err) => {
+    console.log('ERROR: ' + err.message);
+});
+
+ventilation.on('close', () => {
+    console.log('Connection to Comfoair closed');
+});
+
+ventilation.on('open', () => {
+    console.log('Connected to Comfoair :)');
+
+    ventilation.setLevel('middle', (err, resp) => {
+        if (err) console.log(err.message);
+        else console.log(resp);
+
+        ventilation.close();
+    });
 });
 ```
 
@@ -79,29 +113,39 @@ ventilationConnector.setLevel('high', (err, resp) => {
 Also you can use it as a duplex stream.
 
 ```javascript
-const Comfoair = require('comfoair');
+const ComfoairStream = require('comfoair').ComfoairStream;
 
-const ventilationConnector = new Comfoair({
+const ventilationStream = new ComfoairStream({
     port: '/dev/ttyUSB0',
     baud: 9600
 });
 
-ventilationConnector.on('data', chunk => {
+ventilationStream.on('error', (err) => {
+    console.log('ERROR: ' + err.message);
+});
+
+ventilationStream.on('close', () => {
+    console.log('Connection to Comfoair closed');
+});
+
+ventilationStream.on('data', chunk => {
     console.log(chunk);
     if (chunk.type === 'RES') {
-        comfoair.close();
+        ventilationStream.close();
     }
 });
 
 const command = {
-    name: 'setLevel',
-    params: {
-        level: 'high'
-    }
-});
+    name: 'getFanState',
+    params: {}
+};
 
-comfoair.write(command, (err) => {
-    if (err) return console.error(err.message);
+ventilationStream.on('open', () => {
+    console.log('Connected to Comfoair :)');
+
+    ventilationStream.write(command, (err) => {
+        if (err) return console.log('ERROR: ' + err.message);
+    });
 });
 ```
 
@@ -214,6 +258,45 @@ Response
             "value": 1120,
             "label": "Rotaitions outgoing",
             "unit": "rpm"
+        }
+    }
+}
+```
+
+#### getFlapState
+
+Request state of the bypass and preheater. No parameter required.
+
+```javascript
+getFlapState(callback);
+```
+
+Response
+
+```json
+{
+    "type": "RES",
+    "valid": true,
+    "payload": {
+        "description": "Flap state",
+        "bypass": {
+            "value": 0,
+            "label": "Bypass",
+            "unit": "%"
+        },
+        "preheat": {
+            "value": "Unknown",
+            "label": "Preheat"
+        },
+        "bypassMotorCurrent": {
+            "value": 0,
+            "label": "Bypass Motor Current",
+            "unit": "A"
+        },
+        "preheatMotorCurrent": {
+            "value": 0,
+            "label": "Preheat Motor Current",
+            "unit": "A"
         }
     }
 }
@@ -554,7 +637,7 @@ Set the ventilation level.
 |:----------|:--------------|:----------------------------------------------------|
 | level     | string/number | 'away', 'low', 'middle', 'high', 0, 1, 2, 3, 'auto' |
 
-Where 'away' is the same as 0, 'low' is the same as 1 and so on. The numbers 0 to 3 can also be passed als string. The setting 'auto' seems to be for the external Panel for the ventilation system.
+Where 'away' is the same as 0, 'low' is the same as 1 and so on. The numbers 0 to 3 can also be passed als string. The setting 'auto' seems to be for the external Panel for the ventilation system and isn't testet.
 
 ```javascript
 setLevel('high', callback);
@@ -570,7 +653,7 @@ Response
 
 #### setComfortTemperature
 
-Set the ventilation level.
+Set the comfort Temperature.
 
 | Parameter   | Type   | Description                           |
 |:------------|:-------|:--------------------------------------|
@@ -636,4 +719,19 @@ Response
 {
     "type": "ACK"
 }
+```
+
+#### runCommand
+
+It is also possible to pass the commands as strings. For this you can use this function.
+
+```javascript
+
+const commandName = 'setLevel';
+const params = { level: 'away' };
+
+runCommand(commandName, params, (err, response) => {
+    if (err) return console.log(err.message);
+    console.log(response);
+});
 ```
