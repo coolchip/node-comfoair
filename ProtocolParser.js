@@ -3,13 +3,7 @@
 const Transform = require('stream').Transform;
 const bufferReplace = require('buffer-replace');
 const commands = require('./commands');
-
-const startSeq = Buffer.from([0x07, 0xF0]);
-const endSeq = Buffer.from([0x07, 0x0F]);
-const ackSeq = Buffer.from([0x07, 0xF3]);
-
-const doubleSeven = Buffer.from([0x07, 0x07]);
-const singleSeven = Buffer.from([0x07]);
+const sequences = require('./sequences');
 
 // parse a chunk from comfoair
 class ProtocolParser extends Transform {
@@ -68,9 +62,9 @@ class ProtocolParser extends Transform {
                 payload: {},
                 error
             };
-        }
+        };
 
-        // break if length = 0 ... don't know why this happens. when it happens, 
+        // break if length = 0 ... don't know why this happens. when it happens,
         // length is in the next byte. But we ignore this.
         if (telegramLength[0] === 0) {
             return invalid('Frame length is null');
@@ -78,7 +72,7 @@ class ProtocolParser extends Transform {
 
         // search and replace double 0x07 in data section
         const data = payload.slice(3, payload.length - 1);
-        const cleanData = bufferReplace(data, doubleSeven, singleSeven);
+        const cleanData = bufferReplace(data, sequences.doubleSeven, sequences.singleSeven);
         if (telegramLength[0] !== cleanData.length) {
             return invalid('Invalid frame length');
         }
@@ -88,7 +82,7 @@ class ProtocolParser extends Transform {
         const cleanPayload = Buffer.concat([response, telegramLength, cleanData]);
         const valid = this.isChecksumValid(cleanPayload, checksum);
         if (!valid) {
-            return invalid(`Checksum is invalid`);
+            return invalid('Checksum is invalid');
         }
 
         // parse data
@@ -97,19 +91,19 @@ class ProtocolParser extends Transform {
             return {
                 type,
                 valid,
-                payload: parsedData,
+                payload: parsedData
             };
         } catch (e) {
             return invalid(`Error while parsing: ${e.message}]`);
         }
     }
 
-    _transform(chunk, encoding, cb) {
+    _transform(chunk, encoding, callback) {
         let buffer = Buffer.concat([this.buffer, chunk]);
 
         while (buffer.length >= 2) {
             const head = buffer.slice(0, 2);
-            if (head.equals(ackSeq)) {
+            if (head.equals(sequences.ack)) {
                 // found ack -> push, if necessary
                 if (this.config.passAcks) {
                     this.push({
@@ -118,9 +112,9 @@ class ProtocolParser extends Transform {
                     });
                 }
                 buffer = buffer.slice(2);
-            } else if (head.equals(startSeq)) {
+            } else if (head.equals(sequences.start)) {
                 // found start of a response -> search for end
-                const indexEndSeq = buffer.indexOf(endSeq, 2)
+                const indexEndSeq = buffer.indexOf(sequences.end, 2);
                 if (indexEndSeq !== -1) {
                     // found end -> push parsed payload
                     const payload = buffer.slice(2, indexEndSeq);
@@ -137,12 +131,12 @@ class ProtocolParser extends Transform {
             }
         }
         this.buffer = buffer;
-        cb();
+        callback();
     }
 
-    _flush(cb) {
+    _flush(callback) {
         this.buffer = Buffer.alloc(0);
-        cb();
+        callback();
     }
 }
 

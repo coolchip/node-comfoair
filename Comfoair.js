@@ -1,183 +1,103 @@
 'use strict';
 
-const SerialPort = require('serialport');
-const {
-    Duplex
-} = require('stream');
-const bufferReplace = require('buffer-replace');
+const EventEmitter = require('events');
+const ComfoairStream = require('./ComfoairStream');
 const commands = require('./commands');
-const ProtocolParser = require('./ProtocolParser');
 
-const startSeq = Buffer.from([0x07, 0xF0]);
-const endSeq = Buffer.from([0x07, 0x0F]);
-const ackSeq = Buffer.from([0x07, 0xF3]);
+const queue = require('queue');
 
-const doubleSeven = Buffer.from([0x07, 0x07]);
-const singleSeven = Buffer.from([0x07]);
+const QUEUE_TIMEOUT = 5 * 1000;
+const MAX_QUEUE_SIZE = 30;
 
-const waitBetweenCommands = 500;
+class Comfoair extends EventEmitter {
+    constructor(config) {
+        super();
 
-class Comfoair extends Duplex {
-    constructor(options, cb) {
-        super({
-            objectMode: true
+        this.comfoair = new ComfoairStream(config);
+        this._registerEvents();
+
+        this.q = queue({
+            concurrency: 1,
+            timeout: QUEUE_TIMEOUT,
+            autostart: true
         });
 
-        this.queue = [];
+        this.q.on('timeout', (next, job) => {
+            this.emit('error', new Error(`Queue timeout of ${QUEUE_TIMEOUT / 1000}s exceeded. Restarting Comfoair module.`));
+            this.comfoair.close();
+            this.comfoair = new ComfoairStream(config);
+            this._registerEvents();
+            setTimeout(next, 1000);
+        });
+    }
 
-        this.options = Object.assign({}, {
-            timeout: 5000
-        }, options);
-
-        this.port = new SerialPort(options.port, {
-            baudRate: options.baud || 9600
-        }, cb);
-
-        this.port.on('open', () => {
+    _registerEvents() {
+        this.comfoair.on('open', () => {
             this.emit('open');
         });
-
-        this.port.on('close', () => {
-            // push the EOF-signaling 'null' chunk
-            this.push(null);
+        this.comfoair.on('close', () => {
             this.emit('close');
         });
-
-        this.port.on('error', err => {
+        this.comfoair.on('error', (err) => {
             this.emit('error', err);
         });
-
-        // set up pipe for parsing messages from comfoair
-        const protocolParser = new ProtocolParser({
-            passAcks: true,
-            debug: options.debug || false
-        });
-        this.parser = this.port.pipe(protocolParser);
-
-        // buffer every received package
-        this.readArr = [];
-        this.parser.on('data', chunk => {
-            this.readArr.push(chunk);
-            if (chunk.type === 'RES') {
-                // send acknowledge to each received response
-                this._sendAcknowledge();
-            }
-        });
-    }
-
-    _calcCheckSum(data) {
-        // start value is 173
-        let sum = 173;
-        for (const b of data) {
-            sum += b;
-        }
-        // return least significant byte
-        return sum & 0xFF;
-    }
-
-    _sendAcknowledge(cb) {
-        this.port.write(ackSeq, cb);
     }
 
     close(cb) {
-        this.port.close(cb);
-        this.queue = [];
+        this.comfoair.close(cb);
     }
 
-    _read(bytesToRead) {
-        const pool = this.readArr;
-
-        // if we have no data, wait till we get some
-        if (!this.port.isOpen || pool.length === 0) {
-            this.parser.once('data', () => {
-                this._read(bytesToRead);
-            });
-            return;
-        }
-
-        // push out data from buffer
-        while (pool.length) {
-            const chunk = pool.shift();
-            if (!this.push(chunk)) {
-                // false from push, stop reading
-                break;
-            }
-        }
-    }
-
-    _write(chunk, cb) {
-        const commandHandler = commands.byName(chunk.name);
-        if (!commandHandler) return cb(new Error('Unknown Comfoair command'));
-
-        const command = Buffer.from(commandHandler.command);
-        const reducer = (accumulator, currentValue) => {
-            const matchingParam = chunk.params[currentValue.name];
-            const currentDataFragment = currentValue.writer(matchingParam);
-            return accumulator.concat(currentDataFragment);
-        };
-        const data = Buffer.from(commandHandler.arg.reduce(reducer, []));
-        const dataLength = Buffer.from([data.length]);
-        const msg = Buffer.concat([command, dataLength, data]);
-        const checksum = Buffer.from([this._calcCheckSum(msg)]);
-
-        // double 0x07 in data section to meet protocol specs
-        const escapedData = bufferReplace(data, singleSeven, doubleSeven);
-
-        // send message to comfoair
-        const req = Buffer.concat([startSeq, command, dataLength, escapedData, checksum, endSeq]);
-        this.port.write(req, cb);
-    }
-
+    // @todo: Automaticly add functions from commands.js
     getBootloaderVersion(cb) {
-        return this._send('getBootloaderVersion', {}, cb);
+        return this._enqueue('getBootloaderVersion', {}, cb);
     }
 
     getFirmwareVersion(cb) {
-        return this._send('getFirmwareVersion', {}, cb);
+        return this._enqueue('getFirmwareVersion', {}, cb);
     }
 
     getFlapState(cb) {
-        return this._send('getFlapState', {}, cb);
+        return this._enqueue('getFlapState', {}, cb);
     }
 
     getFanState(cb) {
-        return this._send('getFanState', {}, cb);
+        return this._enqueue('getFanState', {}, cb);
     }
 
     getOperatingHours(cb) {
-        return this._send('getOperatingHours', {}, cb);
+        return this._enqueue('getOperatingHours', {}, cb);
     }
 
     getVentilationLevel(cb) {
-        return this._send('getVentilationLevel', {}, cb);
+        return this._enqueue('getVentilationLevel', {}, cb);
     }
 
     getTemperatures(cb) {
-        return this._send('getTemperatures', {}, cb);
+        return this._enqueue('getTemperatures', {}, cb);
     }
 
     getTemperatureStates(cb) {
-        return this._send('getTemperatureStates', {}, cb);
+        return this._enqueue('getTemperatureStates', {}, cb);
     }
 
     getFaults(cb) {
-        return this._send('getFaults', {}, cb);
+        return this._enqueue('getFaults', {}, cb);
     }
 
     setLevel(level, cb) {
-        return this._send('setLevel', {
+        return this._enqueue('setLevel', {
             level
         }, cb);
     }
 
     setComfortTemperature(temperature, cb) {
-        return this._send('setComfortTemperature', {
+        return this._enqueue('setComfortTemperature', {
             temperature
         }, cb);
     }
 
     setVentilationLevel(exhaustAway, exhaustLow, exhaustMiddle, exhaustHigh, supplyAway, supplyLow, supplyMiddle, supplyHigh, cb) {
-        return this._send('setVentilationLevel', {
+        return this._enqueue('setVentilationLevel', {
             exhaustAway,
             exhaustLow,
             exhaustMiddle,
@@ -190,7 +110,7 @@ class Comfoair extends Duplex {
     }
 
     reset(resetFaults, resetSettings, runSelfTest, resetFilterTimer, cb) {
-        return this._send('reset', {
+        return this._enqueue('reset', {
             resetFaults,
             resetSettings,
             runSelfTest,
@@ -199,67 +119,67 @@ class Comfoair extends Duplex {
     }
 
     runCommand(commandName, params, cb) {
-        return this._send(commandName, params, cb);
+        return this._enqueue(commandName, params, cb);
     }
 
-    _send(commandName, params, cb) {
-        const queueLength = this.queue.push({
-            commandName,
-            params,
-            cb
-        });
-        if (queueLength === 1) setTimeout(this._sendFromQueue.bind(this), waitBetweenCommands);
-    }
-
-    _sendFromQueue() {
-        if (this.queue.length <= 0) return;
-        const {
-            commandName,
-            params,
-            cb
-        } = this.queue.pop();
-        const expectAck = commands.byName(commandName).response ? false : true;
-
-        // run next command if present
-        const triggerNextCommand = () => {
-            if (this.queue.length > 0) return setTimeout(this._sendFromQueue.bind(this), waitBetweenCommands);
-        };
-
-        // set up timeout, if we get no answer
-        const timeoutHandler = () => {
-            this.parser.removeListener('data', dataHandler);
-            const err = new Error(`Timeout after ${this.options.timeout / 1000} seconds while waiting for data from Comfoair`);
-            triggerNextCommand();
+    _enqueue(commandName, params, cb) {
+        const returnError = (err) => {
             if (typeof cb === 'function') return cb(err);
             this.emit('error', err);
         };
-        const timerId = setTimeout(timeoutHandler, this.options.timeout);
-
-        // use callback to return received chunks
-        const dataHandler = (chunk) => {
-            if (chunk.type === 'ACK' && expectAck === false) return;
-            clearTimeout(timerId);
-            this.parser.removeListener('data', dataHandler);
-            triggerNextCommand();
-            cb(null, chunk);
+        const returnData = (data) => {
+            if (typeof cb === 'function') return cb(null, data);
+            this.emit('data', data);
         };
-        this.parser.on('data', dataHandler);
 
-        // prepare chunk for writing to comfoair
-        const chunk = {
-            name: commandName,
-            params
-        };
-        this._write(chunk, (err) => {
-            if (err) {
-                clearTimeout(timerId);
-                this.parser.removeListener('data', dataHandler);
-                if (typeof cb === 'function') return cb(err);
-                this.emit('error', err);
-            }
+        const commandStructure = commands.byName(commandName);
+        if (!commandStructure) {
+            return returnError(new Error(`Command "${commandName}" unknown.`));
+        }
+        const expectAck = !commandStructure.response;
+
+        if (this.q.length >= MAX_QUEUE_SIZE) {
+            return returnError(new Error(`Queue size of ${MAX_QUEUE_SIZE} exceeded. Command "${commandName}" discarded.`));
+        }
+
+        this.q.push((done) => {
+            const cleanUp = () => {
+                clearTimeout(timer);
+                this.comfoair.removeListener('data', dataHandler);
+            };
+
+            const timeout = () => {
+                cleanUp();
+                returnError(new Error(`Command "${commandName}" timeout exceeded.`));
+                done();
+            };
+            const timer = setTimeout(timeout, 1 * 1000);
+
+            const dataHandler = (chunk) => {
+                // if not expecting an ACK, return and wait for next data event
+                if (chunk.type === 'ACK' && expectAck === false) return;
+                cleanUp();
+                returnData(chunk);
+                done();
+            };
+            this.comfoair.on('data', dataHandler);
+
+            const executeCommand = () => {
+                const chunk = {
+                    name: commandName,
+                    params
+                };
+                this.comfoair.write(chunk, 'utf-8', (err) => {
+                    if (err) {
+                        cleanUp();
+                        returnError(new Error(`Comfoair error: ${err.message}`));
+                        done();
+                    }
+                });
+            };
+            process.nextTick(executeCommand);
         });
     }
 }
 
 module.exports = Comfoair;
-

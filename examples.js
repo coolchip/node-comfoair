@@ -1,43 +1,61 @@
 'use strict';
 
-const Comfoair = require('./Comfoair');
+const Comfoair = require('./index');
+const ComfoairStream = require('./index').ComfoairStream;
 
-const myPort = '/home/sebastian/dev/ttyV0';
-const mySpeed = 9600;
+const myPort = '/dev/ttyUSB0';
+const baud = 9600;
 
 const byCall = function (level, cb) {
     const vent = new Comfoair({
         port: myPort,
-        baud: mySpeed
+        baud
     });
 
-    if (level) {
-        vent.setLevel(level, (err, resp) => {
-            if (err) return console.error(err.message);
-            console.log(resp);
-        });
-    }
+    const handleError = (err) => {
+        console.error(err.message);
+        vent.close(cb);
+    };
 
-    vent.getBootloaderVersion((err, resp) => {
-        if (err) return console.error(err.message);
-        console.log(resp);
-        vent.getTemparatures((err, resp) => {
-            if (err) return console.error(err.message);
-            console.log(resp);
-            vent.getTemparatureStates((err, resp) => {
+    vent.on('error', (err) => {
+        console.log(err.message);
+    });
+
+    vent.on('close', () => {
+        console.log('vent by call closed');
+    });
+
+    vent.on('open', () => {
+        console.log('vent by call opened');
+
+        if (level) {
+            vent.setLevel(level, (err, resp) => {
                 if (err) return console.error(err.message);
                 console.log(resp);
-                vent.getFaults((err, resp) => {
-                    if (err) return console.error(err.message);
+            });
+        }
+
+        vent.getBootloaderVersion((err, resp) => {
+            if (err) return handleError(err);
+            console.log(resp);
+            vent.getTemperatures((err, resp) => {
+                if (err) return handleError(err);
+                console.log(resp);
+                vent.getTemperatureStates((err, resp) => {
+                    if (err) return handleError(err);
                     console.log(resp);
-                    vent.getOperatingHours((err, resp) => {
-                        if (err) return console.error(err.message);
+                    vent.getFaults((err, resp) => {
+                        if (err) return handleError(err);
                         console.log(resp);
-                        vent.getVentilationLevel((err, resp) => {
-                            vent.close();
-                            if (err) return console.error(err.message);
+                        vent.getOperatingHours((err, resp) => {
+                            if (err) return handleError(err);
                             console.log(resp);
-                            cb();
+                            vent.getVentilationLevel((err, resp) => {
+                                vent.close();
+                                if (err) return handleError(err);
+                                console.log(resp);
+                                vent.close(cb);
+                            });
                         });
                     });
                 });
@@ -47,9 +65,17 @@ const byCall = function (level, cb) {
 };
 
 const byStreaming = function (level, cb) {
-    const vent = new Comfoair({
+    const vent = new ComfoairStream({
         port: myPort,
-        baud: mySpeed
+        baud
+    });
+
+    vent.on('error', (err) => {
+        console.log(err.message);
+    });
+
+    vent.on('close', () => {
+        console.log('vent by stream closed');
     });
 
     vent.on('data', chunk => {
