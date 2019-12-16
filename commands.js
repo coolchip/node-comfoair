@@ -89,7 +89,7 @@ const writer = {
         return [value];
     },
     temperature(temperature) {
-        const normTemperature = (temperature - 20) / 2;
+        const normTemperature = (temperature + 20) * 2;
         return [normTemperature];
     },
     bool(value) {
