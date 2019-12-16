@@ -1,6 +1,6 @@
 {
   "name": "comfoair",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Library to control a Zehnder Comfoair 350 and similar ventilation devices",
   "main": "index.js",
   "scripts": {
