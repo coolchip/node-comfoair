@@ -246,14 +246,14 @@ const commands = [
         }, {
             length: 2,
             reader: reader.rotation,
-            name: 'rotaitionsSupply',
-            label: 'Rotaitions supply',
+            name: 'rotationsSupply',
+            label: 'Rotations supply',
             unit: 'rpm'
         }, {
             length: 2,
             reader: reader.rotation,
-            name: 'rotaitionsOutgoing',
-            label: 'Rotaitions outgoing',
+            name: 'rotationsOutgoing',
+            label: 'Rotations outgoing',
             unit: 'rpm'
         }]
     },
@@ -349,7 +349,7 @@ const commands = [
     },
     {
         name: 'getVentilationLevel',
-        label: 'Get ventilation levles',
+        label: 'Get ventilation levels',
         command: [0x00, 0xCD],
         arg: [],
         response: [0x00, 0xCE],

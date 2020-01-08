@@ -249,14 +249,14 @@ Response
             "label": "Outgoing air",
             "unit": "%"
         },
-        "rotaitionsSupply": {
+        "rotationsSupply": {
             "value": 1138,
-            "label": "Rotaitions supply",
+            "label": "Rotations supply",
             "unit": "rpm"
         },
-        "rotaitionsOutgoing": {
+        "rotationsOutgoing": {
             "value": 1120,
-            "label": "Rotaitions outgoing",
+            "label": "Rotations outgoing",
             "unit": "rpm"
         }
     }
@@ -377,7 +377,7 @@ Response
     "type": "RES",
     "valid": true,
     "payload": {
-        "description": "Get ventilation levles",
+        "description": "Get ventilation levels",
         "exhaustAway": {
             "value": 15,
             "label": "Exhaust fan level away",
