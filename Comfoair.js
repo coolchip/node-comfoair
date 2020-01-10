@@ -160,7 +160,7 @@ class Comfoair extends EventEmitter {
             const timer = setTimeout(timeout, 1 * 1000);
 
             const dataHandler = (chunk) => {
-                // if not expecting an ACK, return and wait for next data event
+                // if expecting data and get an ACK, return and wait for next data event
                 if (chunk.type === 'ACK' && expectAck === false) return;
                 cleanUp();
                 returnData(chunk);
