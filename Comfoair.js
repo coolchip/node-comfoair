@@ -22,7 +22,7 @@ class Comfoair extends EventEmitter {
             autostart: true
         });
 
-        this.q.on('timeout', (next, job) => {
+        this.q.on('timeout', (next) => {
             this.emit('error', new Error(`Queue timeout of ${QUEUE_TIMEOUT / 1000}s exceeded. Restarting Comfoair module.`));
             this.comfoair.close();
             this.comfoair = new ComfoairStream(config);
