@@ -67,6 +67,23 @@ class Comfoair extends EventEmitter {
         this.q.start();
     }
 
+    static getAvailableCommands() {
+        const list = commands.list();
+        return list.map((func) => {
+            return {
+                name: func.name,
+                label: func.label,
+                arg: (func.arg.length) ? func.arg.map((arg) => arg) : undefined,
+                response: (func.description) ? func.description.map((desc) => {
+                    return {
+                        name: desc.name,
+                        label: desc.label
+                    };
+                }) : undefined,
+            };
+        });
+    }
+
     // @todo: Automaticly add functions from commands.js
     getBootloaderVersion(cb) {
         return this._enqueue('getBootloaderVersion', {}, cb);

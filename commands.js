@@ -715,5 +715,8 @@ module.exports = {
         return commands.find((element) => {
             return element.name === name;
         });
-    }
+    },
+    list() {
+        return commands;
+    },
 };
