@@ -52,7 +52,7 @@ class ProtocolParser extends Transform {
 
     parsePayload(payload) {
         const response = payload.slice(0, 2);
-        const telegramLength = payload.slice(2, 3);
+        const telegramLength = payload[2];
         const type = 'RES';
 
         const invalid = (error) => {
@@ -66,20 +66,22 @@ class ProtocolParser extends Transform {
 
         // break if length = 0 ... don't know why this happens. when it happens,
         // length is in the next byte. But we ignore this.
-        if (telegramLength[0] === 0) {
+        if (telegramLength === 0) {
             return invalid('Frame length is null');
         }
 
         // search and replace double 0x07 in data section
         const data = payload.slice(3, payload.length - 1);
         const cleanData = bufferReplace(data, sequences.doubleSeven, sequences.singleSeven);
-        if (telegramLength[0] !== cleanData.length) {
-            return invalid('Invalid frame length');
+        if (telegramLength !== cleanData.length) {
+            //return invalid('Invalid frame length');
+            return invalid(`Invalid frame length. data[${telegramLength}]: ${data.toString('hex')}, cleanData[${cleanData.length}]: ${cleanData.toString('hex')}`);
+
         }
 
-        // check sum
+        // validate checksum
         const checksum = payload.readUInt8(payload.length - 1);
-        const cleanPayload = Buffer.concat([response, telegramLength, cleanData]);
+        const cleanPayload = Buffer.concat([response, new Uint8Array([telegramLength]), cleanData]);
         const valid = this.isChecksumValid(cleanPayload, checksum);
         if (!valid) {
             return invalid('Checksum is invalid');
