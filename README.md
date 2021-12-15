@@ -736,6 +736,21 @@ runCommand(commandName, params, (err, response) => {
 });
 ```
 
+### Additional info from [VincentSC](https://github.com/VincentSC)
+Zehnder talks about intake, exhaust, supply and extract. Or extract, supply, incoming and outgoing.
+
+This library uses supply, exhaust, outgoing and outside.
+
+![intake-exhaust-supply-extract](https://github.com/coolchip/node-red-contrib-comfoair/blob/master/image1.png)
+
+![image](https://github.com/coolchip/node-red-contrib-comfoair/blob/master/image2.png)
+
+This is my guess how it translates:
+- `outside` = intake / incoming
+- `supply` = supply 
+- `exhaust` = extract
+- `outgoing` = exhaust / outgoing
+
 ## Migration to 1.x.x
 
 There are only tiny API changes. The main difference is in using this module in streaming Mode. In Version 0.x.x you can simply use the same Module for function calls and streaming. Starting with 1.0.0 you have to choose the streaming module explicit.
