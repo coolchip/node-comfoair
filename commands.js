@@ -79,6 +79,15 @@ const reader = {
     },
     filterState(data) {
         return Boolean(data.readInt8(0));
+    },
+    rs232ModeState(data) {
+        const mode = data.readInt8(0);
+        if (mode === 0) return 'Without Connection';
+        if (mode === 1) return 'Only PC';
+        if (mode === 2) return 'Only CC-Ease';
+        if (mode === 3) return 'PC master';
+        if (mode === 4) return 'PC log mode';
+        return mode;
     }
 };
 
@@ -131,6 +140,40 @@ const writer = {
             return [match.value];
         }
         throw new Error(`unknown level: ${level}`);
+    },
+    rs232Enum(mode) {
+        if (mode == null) throw new Error('mode not set');
+        const modes = [{
+            key: 'end',
+            value: 0x00
+        }, {
+            key: '0',
+            value: 0x00
+        }, {
+            key: 'onlyPc',
+            value: 0x01
+        }, {
+            key: '1',
+            value: 0x01
+        }, {
+            key: 'pcMaster',
+            value: 0x03
+        }, {
+            key: '3',
+            value: 0x03
+        }, {
+            key: 'pcLogMode',
+            value: 0x04
+        }, {
+            key: '4',
+            value: 0x04
+        }];
+        mode = mode.toString();
+        const match = modes.find(item => item.key === mode);
+        if (match) {
+            return [match.value];
+        }
+        throw new Error(`unknown RS232 mode: ${mode}`);
     }
 };
 
@@ -622,6 +665,23 @@ const commands = [
             writer: writer.levelEnum,
             name: 'level',
             label: 'level'
+        }]
+    },
+    {
+        name: 'setRs232Mode',
+        label: 'Set RS232 mode',
+        command: [0x00, 0x9B],
+        arg: [{
+            writer: writer.rs232Enum,
+            name: 'mode',
+            label: 'mode'
+        }],
+        response: [0x00, 0x9C],
+        description: [{
+            length: 1,
+            reader: reader.rs232ModeState,
+            name: 'currentMode',
+            label: 'current RS23 Mode'
         }]
     },
     {
