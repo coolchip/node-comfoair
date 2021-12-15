@@ -12,12 +12,13 @@ const MAX_QUEUE_SIZE = 30;
 class Comfoair extends EventEmitter {
     constructor(config) {
         super();
+        this.config = config;
 
         this.comfoair = new ComfoairStream(config);
         this._registerEvents();
 
         this.q = queue({
-            concurrency: 1,
+            concurrency: 1, // no parallel jobs
             timeout: QUEUE_TIMEOUT,
             autostart: true
         });
@@ -27,6 +28,11 @@ class Comfoair extends EventEmitter {
             this.comfoair.close();
             this.comfoair = new ComfoairStream(config);
             this._registerEvents();
+
+            // empty and restart queue
+            this.q.end();
+            this.q.start();
+
             setTimeout(next, 1000);
         });
     }
@@ -44,7 +50,21 @@ class Comfoair extends EventEmitter {
     }
 
     close(cb) {
-        this.comfoair.close(cb);
+        this.comfoair.close(() => {
+            this.comfoair = null;
+
+            // empty and stop queue
+            this.q.end();
+            if (cb) cb();
+        });
+    }
+
+    open() {
+        this.comfoair = new ComfoairStream(this.config);
+        this._registerEvents();
+
+        // restart queue
+        this.q.start();
     }
 
     // @todo: Automaticly add functions from commands.js
@@ -135,6 +155,8 @@ class Comfoair extends EventEmitter {
             if (typeof cb === 'function') return cb(null, data);
             this.emit('data', data);
         };
+
+        if (!this.comfoair) return returnError(new Error('Connection closed. Please open Connection first.'));
 
         const commandStructure = commands.byName(commandName);
         if (!commandStructure) {
