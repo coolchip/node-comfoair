@@ -142,10 +142,10 @@ class Comfoair extends EventEmitter {
             exhaustAway,
             exhaustLow,
             exhaustMiddle,
-            exhaustHigh,
             supplyAway,
             supplyLow,
             supplyMiddle,
+            exhaustHigh,
             supplyHigh
         }, cb);
     }

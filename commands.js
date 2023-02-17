@@ -655,11 +655,6 @@ const commands = [
             unit: '%'
         }, {
             writer: writer.levelValue,
-            name: 'exhaustHigh',
-            label: 'exhaust high',
-            unit: '%'
-        }, {
-            writer: writer.levelValue,
             name: 'supplyAway',
             label: 'supply away',
             unit: '%'
@@ -672,6 +667,11 @@ const commands = [
             writer: writer.levelValue,
             name: 'supplyMiddle',
             label: 'supply middle',
+            unit: '%'
+        }, {
+            writer: writer.levelValue,
+            name: 'exhaustHigh',
+            label: 'exhaust high',
             unit: '%'
         }, {
             writer: writer.levelValue,
