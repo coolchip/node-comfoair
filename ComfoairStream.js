@@ -1,7 +1,7 @@
 'use strict';
 
 const Duplex = require('stream').Duplex;
-const SerialPort = require('serialport');
+const { SerialPort } = require('serialport');
 const ProtocolParser = require('./ProtocolParser');
 const ProtocolFramer = require('./ProtocolFramer');
 
@@ -11,7 +11,8 @@ class ComfoairStream extends Duplex {
             objectMode: true
         });
 
-        this.port = new SerialPort(options.port, {
+        this.port = new SerialPort({ 
+            path: options.port,
             baudRate: options.baud || 9600
         }, cb);
 
