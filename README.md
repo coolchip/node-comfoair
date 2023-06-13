@@ -8,8 +8,7 @@
 
 **Comfoair is an Open Source Node.js implementaion of the communication protocoll done and used by Zehnder. You can use this libary to control your personal ventialtion system.**
 
-This work based on the protocol description at http://www.see-solutions.de/sonstiges/Protokollbeschreibung_ComfoAir.pdf, the very usefull [openHAB binding 'ComfoAir'](
-https://www.openhab.org/addons/bindings/comfoair1/), the fantastic [FHEM module 'ComfoAir'](https://wiki.fhem.de/wiki/ComfoAir) and a little bit research of my own. Hope you will like it.
+This work based on the protocol description at http://www.see-solutions.de/sonstiges/Protokollbeschreibung_ComfoAir.pdf, the very usefull [openHAB binding 'ComfoAir'](https://www.openhab.org/addons/bindings/comfoair/#comfoair-binding), the fantastic [FHEM module 'ComfoAir'](https://wiki.fhem.de/wiki/ComfoAir) and a little bit research of my own. Hope you will like it.
 
 ### Supports the following systems (afaik)
 
